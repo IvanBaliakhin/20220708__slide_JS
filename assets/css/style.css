@@ -66,3 +66,45 @@ just for appearance; change whatever you want
 .slide:nth-of-type(5) {
   background: purple;
 }
+
+.container {
+  min-width: 992px;
+  padding: 0 20px;
+  margin: auto;
+}
+
+.slides {
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.control {
+  display: block;
+  padding: 10px 20px;
+  cursor: pointer;
+  user-select: none;
+  background-color: lightsteelblue;
+}
+
+.indicators {
+  display: flex;
+  gap: 10px;
+}
+
+.indicator {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: steelblue;
+  cursor: pointer;
+  user-select: none;
+}
+
+.indicator.active {
+  background-color: tomato;
+}
