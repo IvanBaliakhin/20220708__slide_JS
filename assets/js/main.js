@@ -1,108 +1,143 @@
-(function () {
-  const container = document.querySelector('#carousel');
-  const slides = container.querySelectorAll('.slide');
-  const indicatorContainer = container.querySelector('.indicators');
-  const indicators = indicatorContainer.querySelectorAll('.indicator');
-  const pauseBtn = document.querySelector('#pause');
-  const prevBtn = document.querySelector('#prev');
-  const nextBtn = document.querySelector('#next');
+function Carousel() {
+
+  this.container = document.querySelector('#carousel');
+  this.slides = this.container.querySelectorAll('.slide');
+  this.indicatorContainer = this.container.querySelector('.indicators');
+  this.indicators = this.indicatorContainer.querySelectorAll('.indicator');
+}
+
+Carousel.prototype = {
+  _initProps () {
+    this.currentSlide = 0;
+    this.isPlaying = true;
+    this.interval = 1000;
   
-  let currentSlide = 0;
-  let isPlaying = true;
-  let timerID = null;
-  let interval = 1000;
-  let swipeStartX = null;
-  let swipeEndX = null;
-  
-  const SLIDES_LENGTH = slides.length;
-  const CODE_LEFT_ARROW = 'ArrowLeft';
-  const CODE_RIGHT_ARROW = 'ArrowRight';
-  const CODE_SPACE = 'Space';
-  
-  function gotoNth(n) {
+    this.SLIDES_LENGTH = this.slides.length;
+    this.CODE_LEFT_ARROW = 'ArrowLeft';
+    this.CODE_RIGHT_ARROW = 'ArrowRight';
+    this.CODE_SPACE = 'Space';
+  },
+
+  _initControls () {
+    const controls = document.createElement('div');
+    const PAUSE = '<span class="control control-pause" id="pause">Pause</span>';
+    const PREV = '<span class="control control-prev" id="prev">Prev</span>';
+    const NEXT = '<span class="control control-next" id="next">Next</span>';
+
+    controls.setAttribute('class', 'controls');
+    controls.innerHTML = PAUSE + PREV + NEXT;
+
+    this.container.append(controls);
+
+    this.pauseBtn = document.querySelector('#pause');
+    this.prevBtn = document.querySelector('#prev');
+    this.nextBtn = document.querySelector('#next');
+  },
+
+  _initIndicators () {
+    // <div class="indicators">
+    //     <div class="indicator active" data-slide-to="0"></div>
+    //     <div class="indicator" data-slide-to="1"></div>
+    //     <div class="indicator" data-slide-to="2"></div>
+    //     <div class="indicator" data-slide-to="3"></div>
+    //     <div class="indicator" data-slide-to="4"></div>
+    // </div>
+  },
+
+  _initListeners: function () {
+    this.pauseBtn.addEventListener('click', this.pausePlay.bind(this));
+    this.prevBtn.addEventListener('click', this.prev.bind(this));
+    this.nextBtn.addEventListener('click', this.next.bind(this));
+    this.indicatorContainer.addEventListener('click', this._indicate.bind(this));
+    this.container.addEventListener('touchstart', this._swipeStart.bind(this));
+    this.container.addEventListener('touchend', this._swipeEnd.bind(this));
+    document.addEventListener('keydown', this._pressKey.bind(this));
+  },
+
+  _pressKey: function (e) {
+    if (e.code === this.CODE_LEFT_ARROW) this.prev();
+    if (e.code === this.CODE_RIGHT_ARROW) this.next();
+    if (e.code === this.CODE_SPACE) this.pausePlay();
+  },
+
+  _tick () {
+    this.timerID = setInterval(() => this._gotoNext(), this.interval);
+  },
+
+  _gotoNth: function (n) {
     // current: slide active => slide
-    slides[currentSlide].classList.toggle('active');
-    indicators[currentSlide].classList.toggle('active');
-    currentSlide = (n + SLIDES_LENGTH) % SLIDES_LENGTH;
+    this.slides[this.currentSlide].classList.toggle('active');
+    this.indicators[this.currentSlide].classList.toggle('active');
+    this.currentSlide = (n + this.SLIDES_LENGTH) % this.SLIDES_LENGTH;
     // next:    slide => slide active
-    slides[currentSlide].classList.toggle('active');
-    indicators[currentSlide].classList.toggle('active');
-  }
+    this.slides[this.currentSlide].classList.toggle('active');
+    this.indicators[this.currentSlide].classList.toggle('active');
+  },
   
-  function gotoPrev() {
-    gotoNth(currentSlide - 1);
-  }
+  _gotoPrev: function () {
+    this._gotoNth(this.currentSlide - 1);
+  },
   
-  function gotoNext() {
-    gotoNth(currentSlide + 1);
-  }
+  _gotoNext: function () {
+    this._gotoNth(this.currentSlide + 1);
+  },
   
-  function pause() {
-    clearInterval(timerID);
-    isPlaying = false;
-    pauseBtn.innerHTML = 'Play';
-  }
+  _pause: function () {
+    clearInterval(this.timerID);
+    this.isPlaying = false;
+    this.pauseBtn.innerHTML = 'Play';
+  },
   
-  function play() {
-    timerID = setInterval(gotoNext, interval);
-    isPlaying = true;
-    pauseBtn.innerHTML = 'Pause';
-  }
+  _play: function () {
+    this.isPlaying = true;
+    this.pauseBtn.innerHTML = 'Pause';
+    this._tick();
+  },
   
-  const pausePlay = () => isPlaying ? pause() : play();
-  
-  function prev() {
-    gotoPrev();
-    pause();
-  }
-  
-  function next() {
-    gotoNext();
-    pause();
-  }
-  
-  function indicate(e) {
+  _indicate: function (e) {
     const target = e.target;
   
     if (target && target.classList.contains('indicator')) {
-      gotoNth(+target.getAttribute('data-slide-to'));
-      pause();
+      this._gotoNth(+target.getAttribute('data-slide-to'));
+      this._pause();
     }
-  }
+  },
   
-  function pressKey(e) {
-    if (e.code === CODE_LEFT_ARROW) prev();
-    if (e.code === CODE_RIGHT_ARROW) next();
-    if (e.code === CODE_SPACE) pausePlay();
-  }
+  _swipeStart: function (e) {
+    this.swipeStartX = e.changedTouches[0].pageX;
+  },
   
-  function swipeStart(e) {
-    swipeStartX = e.changedTouches[0].pageX;
-  }
-  
-  function swipeEnd(e) {
-    swipeEndX = e.changedTouches[0].pageX;
-  
-    swipeStartX - swipeEndX < -100 && prev();
-    swipeStartX - swipeEndX > 100 && next();
-  }
-  
-  function initListeners() {
-    pauseBtn.addEventListener('click', pausePlay);
-    prevBtn.addEventListener('click', prev);
-    nextBtn.addEventListener('click', next);
-    indicatorContainer.addEventListener('click', indicate);
-    container.addEventListener('touchstart', swipeStart);
-    container.addEventListener('touchend', swipeEnd);
-    document.addEventListener('keydown', pressKey);
-  }
+  _swipeEnd: function (e) {
+    this.swipeEndX = e.changedTouches[0].pageX;
+    this.swipeStartX - this.swipeEndX < -100 && this.prev();
+    this.swipeStartX - this.swipeEndX > 100 && this.next();
+  },
 
-  function init() {
-    initListeners();
-    timerID = setInterval(gotoNext, interval);
-  }
- 
-  // точка входа
-  init();
+  pausePlay: function () {
+    this.isPlaying ? this._pause() : this._play();
+  },
 
-}());
+  prev: function () {
+    this._gotoPrev();
+    this._pause();
+  },
+  
+  next: function () {
+    this._gotoNext();
+    this._pause();
+  },
+
+  init: function () {
+    this._initProps();
+    this._initControls();
+    this._initIndicators();
+    this._initListeners();
+    this._tick();
+  }
+};
+
+Carousel.prototype.constructor = Carousel;
+
+const carousel = new Carousel();
+
+carousel.init();

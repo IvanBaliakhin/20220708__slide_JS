@@ -94,6 +94,7 @@ just for appearance; change whatever you want
 .indicators {
   display: flex;
   gap: 10px;
+  margin-bottom: 20px;
 }
 
 .indicator {
