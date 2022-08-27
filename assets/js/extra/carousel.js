@@ -1,14 +1,34 @@
-function Carousel(containerID = '#carousel', slideID = '.slide') {
-  this.container = document.querySelector(containerID);
-  this.slides = this.container.querySelectorAll(slideID);
-}
+class Carousel {
+  constructor (object) {
+    const settings = this._initConfig(object);
 
-Carousel.prototype = {
-  _initProps () {
+    this.container = document.querySelector(settings.containerID);
+    this.slides = this.container.querySelectorAll(settings.slideID);
+    this.interval = settings.interval;
+    this.isPlaying = settings.isPlaying;
+  }
+
+  _initConfig(paramsObject) {
+    const defaultSettings = {
+      containerID: '#carousel',
+      slideID: '.slide',
+      interval: 2000,
+      isPlaying: true
+    };
+
+    if (paramsObject) {
+      defaultSettings.containerID = paramsObject.containerID || defaultSettings.containerID;
+      defaultSettings.slideID = paramsObject.slideID || defaultSettings.slideID;
+      defaultSettings.interval = paramsObject.interval || defaultSettings.interval;
+      defaultSettings.isPlaying = paramsObject.isPlaying || defaultSettings.isPlaying;
+    }
+
+    return defaultSettings;
+  }
+
+  _initProps() {
     this.currentSlide = 0;
-    this.isPlaying = true;
-    this.interval = 1000;
-  
+    
     this.SLIDES_LENGTH = this.slides.length;
     this.CODE_LEFT_ARROW = 'ArrowLeft';
     this.CODE_RIGHT_ARROW = 'ArrowRight';
@@ -17,9 +37,9 @@ Carousel.prototype = {
     this.FA_PLAY = '<i class="fas fa-play-circle"></i>';
     this.FA_PREV = '<i class="fas fa-angle-left"></i>';
     this.FA_NEXT = '<i class="fas fa-angle-right"></i>';
-  },
+  }
 
-  _initControls () {
+  _initControls() {
     const controls = document.createElement('div');
     const PAUSE = `<span class="control control-pause" id="pause">${this.FA_PAUSE}</span>`;
     const PREV = `<span class="control control-prev" id="prev">${this.FA_PREV}</span>`;
@@ -33,9 +53,9 @@ Carousel.prototype = {
     this.pauseBtn = document.querySelector('#pause');
     this.prevBtn = document.querySelector('#prev');
     this.nextBtn = document.querySelector('#next');
-  },
+  }
 
-  _initIndicators () {
+  _initIndicators() {
     const indicators = document.createElement('div');
     indicators.setAttribute('class', 'indicators');
 
@@ -51,27 +71,27 @@ Carousel.prototype = {
 
     this.indicatorContainer = this.container.querySelector('.indicators');
     this.indicators = this.indicatorContainer.querySelectorAll('.indicator');
-  },
+  }
 
-  _initListeners: function () {
+  _initListeners() {
     this.pauseBtn.addEventListener('click', this.pausePlay.bind(this));
     this.prevBtn.addEventListener('click', this.prev.bind(this));
     this.nextBtn.addEventListener('click', this.next.bind(this));
     this.indicatorContainer.addEventListener('click', this._indicate.bind(this));
     document.addEventListener('keydown', this._pressKey.bind(this));
-  },
+  }
 
-  _pressKey: function (e) {
+  _pressKey(e) {
     if (e.code === this.CODE_LEFT_ARROW) this.prev();
     if (e.code === this.CODE_RIGHT_ARROW) this.next();
     if (e.code === this.CODE_SPACE) this.pausePlay();
-  },
+  }
 
-  _tick () {
+  _tick() {
     this.timerID = setInterval(() => this._gotoNext(), this.interval);
-  },
+  }
 
-  _gotoNth: function (n) {
+  _gotoNth(n) {
     // current: slide active => slide
     this.slides[this.currentSlide].classList.toggle('active');
     this.indicators[this.currentSlide].classList.toggle('active');
@@ -79,58 +99,58 @@ Carousel.prototype = {
     // next:    slide => slide active
     this.slides[this.currentSlide].classList.toggle('active');
     this.indicators[this.currentSlide].classList.toggle('active');
-  },
+  }
   
-  _gotoPrev: function () {
+  _gotoPrev() {
     this._gotoNth(this.currentSlide - 1);
-  },
+  }
   
-  _gotoNext: function () {
+  _gotoNext() {
     this._gotoNth(this.currentSlide + 1);
-  },
+  }
   
-  _pause: function () {
+  _pause() {
     clearInterval(this.timerID);
     this.isPlaying = false;
     this.pauseBtn.innerHTML = this.FA_PLAY;
-  },
+  }
   
-  _play: function () {
+  _play() {
     this.isPlaying = true;
     this.pauseBtn.innerHTML = this.FA_PAUSE;
     this._tick();
-  },
+  }
   
-  _indicate: function (e) {
+  _indicate(e) {
     const target = e.target;
   
     if (target && target.classList.contains('indicator')) {
       this._gotoNth(+target.dataset.slideTo);
       this._pause();
     }
-  },
+  }
 
-  pausePlay: function () {
+  pausePlay() {
     this.isPlaying ? this._pause() : this._play();
-  },
+  }
 
-  prev: function () {
+  prev() {
     this._gotoPrev();
     this._pause();
-  },
+  }
   
-  next: function () {
+  next() {
     this._gotoNext();
     this._pause();
-  },
+  }
 
-  init: function () {
+  init() {
     this._initProps();
     this._initControls();
     this._initIndicators();
     this._initListeners();
     this._tick();
   }
-};
+}
 
-Carousel.prototype.constructor = Carousel;
+export default Carousel;
