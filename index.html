@@ -6,35 +6,30 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>slide__JS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
 
   <div class="container">
-    <div id="carousel" class="carousel">
+    <div id="carousel" class="carousel slider mySlider">
 
-      <div id="slides-container" class="slides">
-        <ul id="slides" class="slides">
-          <li class="slide active">Slide 1</li>
-          <li class="slide">Slide 2</li>
-          <li class="slide">Slide 3</li>
-          <li class="slide">Slide 4</li>
-          <li class="slide">Slide 5</li>
-        </ul>
-      </div>
-
-      <div class="indicators">
-        <div class="indicator active" data-slide-to="0"></div>
-        <div class="indicator" data-slide-to="1"></div>
-        <div class="indicator" data-slide-to="2"></div>
-        <div class="indicator" data-slide-to="3"></div>
-        <div class="indicator" data-slide-to="4"></div>
-      </div>
+      <ul id="slides-container" class="slides">
+        <li class="mySlide item slide active">Slide 1</li>
+        <li class="mySlide item slide">Slide 2</li>
+        <li class="mySlide item slide">Slide 3</li>
+        <li class="mySlide item slide">Slide 4</li>
+        <li class="mySlide item slide">Slide 5</li>
+      </ul>
 
     </div>
   </div>
 
+  <script src="assets/js/extra/carousel.js"></script>
+  <script src="assets/js/extra/swipe-carousel.js"></script>
   <script src="assets/js/main.js"></script>
 
 </body>
